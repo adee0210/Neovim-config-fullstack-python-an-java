@@ -66,7 +66,7 @@ return {
                     }),
                 },
                 experimental = {
-                    ghost_text = true, -- Hiển thị gợi ý mờ (inline ghost text)
+                    ghost_text = false, -- Hiển thị gợi ý mờ (inline ghost text)
                 },
             })
         end,
