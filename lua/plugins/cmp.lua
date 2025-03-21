@@ -54,14 +54,14 @@ return {
                 -- Tùy chỉnh giao diện khung hoàn thành
                 window = {
                     completion = cmp.config.window.bordered({
-                        border = "rounded",          -- Viền bo tròn
+                        border = "rounded",                                                                          -- Viền bo tròn
                         winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder,CursorLine:PmenuSel,Search:None", -- Highlight trong suốt
-                        col_offset = -3,             -- Dịch cột để mở rộng không gian
-                        side_padding = 1,            -- Thêm padding bên để "mở hơn"
-                        scrollbar = false,           -- Tắt scrollbar cho giao diện gọn
+                        col_offset = -3,                                                                             -- Dịch cột để mở rộng không gian
+                        side_padding = 1,                                                                            -- Thêm padding bên để "mở hơn"
+                        scrollbar = false,                                                                           -- Tắt scrollbar cho giao diện gọn
                     }),
                     documentation = cmp.config.window.bordered({
-                        border = "rounded",          -- Viền bo tròn cho tài liệu
+                        border = "rounded",                                          -- Viền bo tròn cho tài liệu
                         winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder", -- Trong suốt
                     }),
                 },
