@@ -5,6 +5,12 @@ return {
     config = function()
         local dashboard = require('dashboard')
 
+        -- Định nghĩa nhóm highlight
+        vim.api.nvim_set_hl(0, 'DashboardFooter', { fg = '#FF69B4', bold = true }) -- Màu hồng cho footer
+        vim.api.nvim_set_hl(0, 'DashboardDesc', { fg = '#FFFFFF' }) -- Màu trắng cho desc
+        vim.api.nvim_set_hl(0, 'DashboardIcon', { fg = '#FF69B4', bold = true }) -- Màu hồng cho icon
+        vim.api.nvim_set_hl(0, 'DashboardKey', { fg = '#87CEEB', bold = true }) -- Màu xanh dương nhạt cho key
+
         -- Hàm tạo footer với thứ, ngày tháng năm
         local function get_footer()
             local datetime = os.date("%A, %d/%m/%Y")
@@ -50,17 +56,17 @@ return {
                     "",
                 },
                 center = {
-                    { desc = '📂 Tạo và mở thư mục mới', group = '@string', 
-                      action = 'lua local path = vim.fn.input("Nhập đường dẫn thư mục mới: ", "", "file"); if path ~= "" then vim.fn.mkdir(path, "p"); vim.cmd("edit " .. path); vim.cmd("redraw"); vim.cmd("echo \'Đã tạo và mở thư mục: " .. path .. "\'"); else vim.cmd("echo \'Không có đường dẫn được nhập\'"); end', key = 'm' },
-                    { desc = '📁 Tạo file mới', group = '@string', action = 'enew', key = 'n' },
-                    { desc = '📂 Mở thư mục cấu hình', group = '@string', action = 'lua vim.cmd("lcd ~/.config/nvim | edit .")', key = 'c' },
-                    { desc = '🔎📂 Tìm thư mục', group = '@string', action = find_directories, key = 'd' },
-                    { desc = '🔎🖹 Tìm file', group = '@string', action = 'Telescope find_files', key = 'f' },
-                    { desc = '🖹 Tìm từ', group = '@string', action = 'Telescope live_grep', key = 'g' },
-                    { desc = '👋 Thoát', group = '@string', action = 'qa', key = 'q' },
+                    { icon = '📂 ', desc = 'Tạo và mở thư mục mới', group = 'DashboardDesc', key = 'm' , 
+                      action = 'lua local path = vim.fn.input("Nhập đường dẫn thư mục mới: ", "", "file"); if path ~= "" then vim.fn.mkdir(path, "p"); vim.cmd("edit " .. path); vim.cmd("redraw"); vim.cmd("echo \'Đã tạo và mở thư mục: " .. path .. "\'"); else vim.cmd("echo \'Không có đường dẫn được nhập\'"); end' },
+                    { icon = '📁 ', desc = 'Tạo file mới', group = 'DashboardDesc', action = 'enew', key = 'n' },
+                    { icon = '📂 ', desc = 'Mở thư mục cấu hình', group = 'DashboardDesc', action = 'lua vim.cmd("lcd ~/.config/nvim | edit .")', key = 'c' },
+                    { icon = '🔎📂 ', desc = 'Tìm thư mục', group = 'DashboardDesc', action = find_directories, key = 'd' },
+                    { icon = '🔎🖹 ', desc = 'Tìm file', group = 'DashboardDesc', action = 'Telescope find_files', key = 'f' },
+                    { icon = '🖹 ', desc = 'Tìm từ', group = 'DashboardDesc', action = 'Telescope live_grep', key = 'g' },
+                    { icon = '👋 ', desc = 'Thoát', group = 'DashboardDesc', action = 'qa', key = 'q' },
                 },
                 footer = get_footer(),
-                disable_move = true, -- Ngăn di chuyển con trỏ
+                disable_move = true,
                 hide = {
                     statusline = false,
                     tabline = false,
@@ -68,6 +74,27 @@ return {
                 },
             },
             shortcut_type = 'letter',
+        })
+
+        -- Áp dụng highlight cho footer và center
+        vim.api.nvim_create_autocmd("FileType", {
+            pattern = "dashboard",
+            callback = function()
+                -- Highlight footer
+                vim.api.nvim_buf_add_highlight(0, -1, 'DashboardFooter', vim.fn.line('$') - 1, 0, -1)
+                -- Highlight center (icon, desc, và key riêng)
+                local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+                for i, line in ipairs(lines) do
+                    if line:match('^%S+%s+.*%s%[.%]') then -- Dòng có icon, desc, và key
+                        local icon_end = line:find('%s') or 0
+                        local key_start = line:find('%[.%]') - 1 or -1
+                        local key_end = key_start + 3 -- [q] dài 3 ký tự
+                        vim.api.nvim_buf_add_highlight(0, -1, 'DashboardIcon', i - 1, 0, icon_end)
+                        vim.api.nvim_buf_add_highlight(0, -1, 'DashboardDesc', i - 1, icon_end, key_start)
+                        vim.api.nvim_buf_add_highlight(0, -1, 'DashboardKey', i - 1, key_start, key_end)
+                    end
+                end
+            end,
         })
 
         -- Hàm để khóa cuộn dashboard
@@ -78,9 +105,9 @@ return {
             vim.opt_local.scrollbind = false
             vim.opt_local.buflisted = false
             vim.g.original_mouse = vim.opt.mouse:get() or "a"
-            vim.opt.mouse = "" -- Tắt chuột trong dashboard
-            vim.opt_local.modifiable = false -- Ngăn chỉnh sửa buffer
-            vim.opt_local.buftype = "nofile" -- Đảm bảo buffer không phải file thông thường
+            vim.opt.mouse = ""
+            vim.opt_local.modifiable = false
+            vim.opt_local.buftype = "nofile"
         end
 
         -- Áp dụng khóa cuộn khi mở dashboard
