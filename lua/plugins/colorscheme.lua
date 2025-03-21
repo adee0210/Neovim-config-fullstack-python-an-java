@@ -11,7 +11,7 @@ return {
                 terminal_colors = true, -- Áp dụng màu cho terminal
                 styles = {
                     comments = { italic = true }, -- Kiểu chữ nghiêng cho comments
-                    keywords = { italic = false },
+                    keywords = { italic = true , bold = true},
                     functions = {},
                     variables = {},
                     sidebars = "transparent", -- Đặt sidebar (như Vim Tree) trong suốt
