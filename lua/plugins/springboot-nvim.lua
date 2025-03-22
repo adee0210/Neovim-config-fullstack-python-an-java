@@ -71,11 +71,11 @@ return {
         end
 
         -- Thiết lập phím tắt
-        vim.keymap.set('n', '<leader>Jr', boot_run, { desc = "Java Run Spring Boot" })
-        vim.keymap.set('n', '<leader>Jx', close_spring_term, { desc = "Java Exit Spring Boot Terminal" })
-        vim.keymap.set('n', '<leader>Jc', springboot_nvim.generate_class, { desc = "Java Create Class" })
-        vim.keymap.set('n', '<leader>Ji', springboot_nvim.generate_interface, { desc = "Java Create Interface" })
-        vim.keymap.set('n', '<leader>Je', springboot_nvim.generate_enum, { desc = "Java Create Enum" })
+        vim.keymap.set('n', '<leader>jr', boot_run, { desc = "Java Run Spring Boot" })
+        vim.keymap.set('n', '<leader>jx', close_spring_term, { desc = "Java Exit Spring Boot Terminal" })
+        vim.keymap.set('n', '<leader>jc', springboot_nvim.generate_class, { desc = "Java Create Class" })
+        vim.keymap.set('n', '<leader>ji', springboot_nvim.generate_interface, { desc = "Java Create Interface" })
+        vim.keymap.set('n', '<leader>je', springboot_nvim.generate_enum, { desc = "Java Create Enum" })
 
         -- Thiết lập plugin với cấu hình mặc định
         springboot_nvim.setup({
