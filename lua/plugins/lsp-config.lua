@@ -1,4 +1,3 @@
--- /home/duc/.config/nvim/lua/plugins.lua
 return {
     -- Plugin Mason để quản lý các công cụ phát triển
     {
@@ -22,6 +21,7 @@ return {
                     "groovyls",         -- Groovy (cho Gradle *.gradle)
                     "kotlin_language_server" -- Kotlin (cho Gradle *.gradle.kts)
                 },
+                automatic_installation = true, -- Tự động cài đặt khi cần
             })
         end,
     },
@@ -47,6 +47,11 @@ return {
     -- Plugin nvim-lspconfig để cấu hình các máy chủ ngôn ngữ
     {
         "neovim/nvim-lspconfig",
+        dependencies = {
+            "williamboman/mason.nvim",
+            "williamboman/mason-lspconfig.nvim",
+            "mfussenegger/nvim-jdtls",
+        },
         config = function()
             local lspconfig = require("lspconfig")
             local capabilities = require("cmp_nvim_lsp").default_capabilities()
@@ -74,23 +79,37 @@ return {
             -- Cấu hình máy chủ ngôn ngữ Groovy (cho Gradle *.gradle)
             lspconfig.groovyls.setup({
                 capabilities = capabilities,
-                filetypes = { "groovy" }, -- Chỉ áp dụng cho file Groovy
-            })
-
-            -- Cấu hình máy chủ ngôn ngữ Kotlin (cho Gradle *.gradle.kts)
-            lspconfig.kotlin_language_server.setup({
-                capabilities = capabilities,
-                filetypes = { "kotlin" }, -- Chỉ áp dụng cho file Kotlin
+                filetypes = { "groovy" },
+                root_dir = lspconfig.util.root_pattern(".git", "gradlew", "build.gradle", "pom.xml"),
             })
 
             -- Cấu hình các phím tắt cho LSP
-            vim.keymap.set("n", "<leader>ch", vim.lsp.buf.hover, { desc = "[C]ode [H]over Documentation" })
-            vim.keymap.set("n", "<leader>cd", vim.lsp.buf.definition, { desc = "[C]ode Goto [D]efinition" })
-            vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, { desc = "[C]ode [A]ctions" })
-            vim.keymap.set("n", "<leader>cr", require("telescope.builtin").lsp_references, { desc = "[C]ode Goto [R]eferences" })
-            vim.keymap.set("n", "<leader>ci", require("telescope.builtin").lsp_implementations, { desc = "[C]ode Goto [I]mplementations" })
-            vim.keymap.set("n", "<leader>cR", vim.lsp.buf.rename, { desc = "[C]ode [R]ename" })
-            vim.keymap.set("n", "<leader>cD", vim.lsp.buf.declaration, { desc = "[C]ode Goto [D]eclaration" })
+            vim.keymap.set("n", "<leader>ch", vim.lsp.buf.hover, { desc = "Tài liệu khi di chuột qua mã" })
+            vim.keymap.set("n", "<leader>cd", vim.lsp.buf.definition, { desc = "Đi đến định nghĩa mã" })
+            vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, { desc = "Hành động mã" })
+            vim.keymap.set("n", "<leader>cr", require("telescope.builtin").lsp_references, { desc = "Đi đến tham chiếu mã" })
+            vim.keymap.set("n", "<leader>ci", require("telescope.builtin").lsp_implementations, { desc = "Đi đến triển khai mã" })
+            vim.keymap.set("n", "<leader>cR", vim.lsp.buf.rename, { desc = "Đổi tên mã" })
+            vim.keymap.set("n", "<leader>cD", vim.lsp.buf.declaration, { desc = "Đi đến khai báo mã" })
+
+            -- Chỉ khởi động JDTLS khi mở file Java (*.java)
+            vim.api.nvim_create_autocmd("FileType", {
+                pattern = "java",
+                callback = function()
+                    require("config.jdtls").setup_jdtls()
+                end,
+            })
+
+            -- Chỉ khởi động Kotlin LSP khi mở file Kotlin (*.kt hoặc *.kts)
+            vim.api.nvim_create_autocmd("FileType", {
+                pattern = { "kotlin", "kts" },
+                callback = function()
+                    require("config.jdtls").setup_kotlin()
+                end,
+            })
+
+            -- Chỉ khởi động Groovy LSP khi mở file Groovy (*.groovy)
+            -- (Đã cấu hình trực tiếp ở trên, không cần gọi lại setup_groovy())
         end,
     },
 }
