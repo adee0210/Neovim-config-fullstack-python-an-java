@@ -12,6 +12,7 @@ return {
                 lua = { "string" }, -- Tự động đóng cặp trong chuỗi Lua
                 javascript = { "template_string" }, -- Tự động đóng cặp trong template string JavaScript
                 java = {}, -- Không cấu hình đặc biệt cho Java
+                python = { "string" },
             }
         })
 

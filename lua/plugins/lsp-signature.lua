@@ -6,8 +6,8 @@ return {
 
         lsp_signature.setup({
             bind = true,
-            floating_window = true,
-            hint_enable = true,
+            floating_window = false,            -- Tắt cửa sổ nổi
+            hint_enable = false,                -- Tắt gợi ý chữ ký
             hint_prefix = "󱄑 ",
             handler_opts = { border = "rounded" },
             transparency = 10,
@@ -25,8 +25,8 @@ return {
                 if client then
                     lsp_signature.on_attach({
                         bind = true,
-                        floating_window = true,
-                        hint_enable = true,
+                        floating_window = false,    -- Tắt cửa sổ nổi
+                        hint_enable = false,        -- Tắt gợi ý chữ ký
                         hint_prefix = "󱄑 ",
                         handler_opts = { border = "rounded" },
                     }, bufnr)

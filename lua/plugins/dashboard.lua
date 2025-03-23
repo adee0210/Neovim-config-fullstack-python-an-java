@@ -34,6 +34,41 @@ return {
             end
         end
 
+        -- Hàm để tắt bufferline và toggleterm khi mở dashboard
+        local function hide_ui_elements()
+            -- Tắt bufferline (giả sử dùng bufferline.nvim)
+            if pcall(require, 'bufferline') then
+                vim.g.bufferline_enabled = false
+                vim.api.nvim_set_hl(0, 'BufferLineFill', { bg = 'NONE' }) -- Ẩn giao diện
+            end
+
+            -- Đóng toggleterm nếu đang mở
+            if pcall(require, 'toggleterm') then
+                local terms = require('toggleterm.terminal').get_all()
+                for _, term in ipairs(terms) do
+                    term:shutdown() -- Đóng hoàn toàn từng terminal
+                end
+            end
+
+            -- Ẩn statusline, tabline, winbar
+            vim.opt.showtabline = 0
+            vim.opt.laststatus = 0
+            vim.opt.winbar = ''
+        end
+
+        -- Hàm để khôi phục UI khi rời dashboard
+        local function restore_ui_elements()
+            -- Khôi phục bufferline
+            if pcall(require, 'bufferline') then
+                vim.g.bufferline_enabled = true
+                vim.cmd('redrawtabline') -- Cập nhật lại tabline
+            end
+
+            -- Khôi phục statusline và tabline
+            vim.opt.showtabline = 2
+            vim.opt.laststatus = 2
+        end
+
         -- Cấu hình dashboard
         dashboard.setup({
             theme = 'doom',
@@ -56,7 +91,7 @@ return {
                     "",
                 },
                 center = {
-                    { icon = '📂 ', desc = 'Tạo và mở thư mục mới', group = 'DashboardDesc', key = 'm' , 
+                    { icon = '📂 ', desc = 'Tạo và mở thư mục mới', group = 'DashboardDesc', key = 'm', 
                       action = 'lua local path = vim.fn.input("Nhập đường dẫn thư mục mới: ", "", "file"); if path ~= "" then vim.fn.mkdir(path, "p"); vim.cmd("edit " .. path); vim.cmd("redraw"); vim.cmd("echo \'Đã tạo và mở thư mục: " .. path .. "\'"); else vim.cmd("echo \'Không có đường dẫn được nhập\'"); end' },
                     { icon = '📁 ', desc = 'Tạo file mới', group = 'DashboardDesc', action = 'enew', key = 'n' },
                     { icon = '📂 ', desc = 'Mở thư mục cấu hình', group = 'DashboardDesc', action = 'lua vim.cmd("lcd ~/.config/nvim | edit .")', key = 'c' },
@@ -97,7 +132,7 @@ return {
             end,
         })
 
-        -- Hàm để khóa cuộn dashboard
+        -- Hàm để khóa cuộn dashboard và tắt UI
         local function lock_dashboard_scrolling()
             vim.opt_local.wrap = false
             vim.opt_local.scrolloff = 0
@@ -108,9 +143,10 @@ return {
             vim.opt.mouse = ""
             vim.opt_local.modifiable = false
             vim.opt_local.buftype = "nofile"
+            hide_ui_elements() -- Tắt bufferline và toggleterm
         end
 
-        -- Áp dụng khóa cuộn khi mở dashboard
+        -- Áp dụng khóa cuộn và tắt UI khi mở dashboard
         vim.api.nvim_create_autocmd("FileType", {
             pattern = "dashboard",
             callback = function()
@@ -118,12 +154,21 @@ return {
             end,
         })
 
-        -- Khôi phục mouse khi rời dashboard
+        -- Khởi động Neovim với dashboard và tắt toggleterm
+        vim.api.nvim_create_autocmd("VimEnter", {
+            callback = function()
+                vim.cmd('Dashboard') -- Mở dashboard khi khởi động
+                lock_dashboard_scrolling() -- Đảm bảo toggleterm bị tắt ngay từ đầu
+            end,
+        })
+
+        -- Khôi phục UI khi rời dashboard
         vim.api.nvim_create_autocmd("BufLeave", {
             pattern = "*",
             callback = function()
                 if vim.bo.filetype == "dashboard" then
                     vim.opt.mouse = vim.g.original_mouse or "a"
+                    restore_ui_elements()
                 end
             end,
         })
@@ -150,5 +195,18 @@ return {
                 lock_dashboard_scrolling()
             end
         end, { noremap = true, silent = true, desc = 'Mở lại Dashboard' })
+
+        -- Lệnh :Dba để mở dashboard
+        vim.api.nvim_create_user_command('Dba', function()
+            local tree_api = pcall(require, 'nvim-tree.api')
+            if tree_api then
+                require('nvim-tree.api').tree.close()
+            end
+            vim.cmd('Dashboard')
+            vim.cmd('lcd ' .. vim.fn.expand('~'))
+            if vim.bo.filetype == "dashboard" then
+                lock_dashboard_scrolling()
+            end
+        end, { desc = 'Mở Dashboard và tắt bufferline, toggleterm' })
     end,
 }
