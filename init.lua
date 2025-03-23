@@ -29,6 +29,7 @@ local opts = {
 		notify = false,
 	},
 }
+vim.g.python3_host_prog = vim.fn.expand("~/.python_envs/global_env/bin/python")
 
 -- Load the options from the config/options.lua file
 require("config.options")
@@ -40,4 +41,5 @@ require("config.autocmds")
 -- Tell lazy that all plugin specs are found in the plugins directory
 -- Pass it the options we specified above
 require("config.music")
+require("plugins.molten")
 require("lazy").setup("plugins", opts)

@@ -35,6 +35,12 @@ local function get_workspace()
     return workspace_dir
 end
 
+-- Hàm kết hợp organize imports và format
+local function organize_and_format()
+    require('jdtls').organize_imports() -- Sắp xếp imports
+    vim.lsp.buf.format({ async = false }) -- Định dạng mã
+end
+
 -- Hàm thiết lập keymaps cho Java
 local function java_keymaps(bufnr)
     local opts = { buffer = bufnr }
@@ -43,7 +49,7 @@ local function java_keymaps(bufnr)
     vim.cmd("command! -buffer JdtBytecode lua require('jdtls').javap()")
     vim.cmd("command! -buffer JdtJshell lua require('jdtls').jshell()")
 
-    vim.keymap.set('n', '<leader>Jo', "<Cmd>lua require('jdtls').organize_imports()<CR>", vim.tbl_extend("force", opts, { desc = "Sắp xếp Imports trong Java" }))
+    vim.keymap.set('n', '<leader>Jo', organize_and_format, vim.tbl_extend("force", opts, { desc = "Sắp xếp Imports và định dạng mã Java" }))
     vim.keymap.set('n', '<leader>Jv', "<Cmd>lua require('jdtls').extract_variable()<CR>", vim.tbl_extend("force", opts, { desc = "Trích xuất Biến trong Java" }))
     vim.keymap.set('v', '<leader>Jv', "<Esc><Cmd>lua require('jdtls').extract_variable(true)<CR>", vim.tbl_extend("force", opts, { desc = "Trích xuất Biến trong Java" }))
     vim.keymap.set('n', '<leader>JC', "<Cmd>lua require('jdtls').extract_constant()<CR>", vim.tbl_extend("force", opts, { desc = "Trích xuất Hằng số trong Java" }))
@@ -52,6 +58,7 @@ local function java_keymaps(bufnr)
     vim.keymap.set('v', '<leader>Jt', "<Esc><Cmd>lua require('jdtls').test_nearest_method(true)<CR>", vim.tbl_extend("force", opts, { desc = "Kiểm tra Phương thức Gần nhất trong Java" }))
     vim.keymap.set('n', '<leader>JT', "<Cmd>lua require('jdtls').test_class()<CR>", vim.tbl_extend("force", opts, { desc = "Kiểm tra Lớp trong Java" }))
     vim.keymap.set('n', '<leader>Ju', "<Cmd>JdtUpdateConfig<CR>", vim.tbl_extend("force", opts, { desc = "Cập nhật Cấu hình trong Java" }))
+    vim.keymap.set('n', '<C-s>', organize_and_format, vim.tbl_extend("force", opts, { desc = "Lưu và định dạng mã Java" }))
 end
 
 -- Hàm chính cấu hình JDTLS
@@ -153,9 +160,13 @@ local function setup_jdtls()
         require('jdtls.setup').add_commands()
         vim.lsp.codelens.refresh()
 
-        vim.api.nvim_create_autocmd("BufWritePost", {
+        -- Tự động chạy organize_and_format khi lưu file Java
+        vim.api.nvim_create_autocmd("BufWritePre", {
+            buffer = bufnr,
             pattern = { "*.java" },
-            callback = function() pcall(vim.lsp.codelens.refresh) end,
+            callback = function()
+                pcall(organize_and_format)
+            end,
         })
     end
 
@@ -188,7 +199,7 @@ local function setup_kotlin()
     local capabilities = require("cmp_nvim_lsp").default_capabilities()
     lspconfig.kotlin_language_server.setup({
         capabilities = capabilities,
-        filetypes = { "kotlin", "kts" }, -- Sửa để hỗ trợ *.kts
+        filetypes = { "kotlin", "kts" },
         root_dir = lspconfig.util.root_pattern(".git", "gradlew", "build.gradle.kts", "pom.xml"),
     })
 end

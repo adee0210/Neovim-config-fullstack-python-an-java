@@ -16,6 +16,7 @@ return {
                 html = { "prettierd" },
                 css = { "prettierd" },
                 markdown = { "prettierd" },
+                python = { "black" }, -- Format Python bằng black
                 -- Java không cần formatter ở đây vì JDTLS sẽ xử lý
             },
             -- Cấu hình tùy chỉnh cho formatter
@@ -35,16 +36,28 @@ return {
                         }
                     end,
                 },
+                black = {
+                    command = "black",
+                    args = { "--fast", "--line-length", "88", "--skip-string-normalization", "-" },
+                    stdin = true,
+                },
             },
             -- Format khi lưu (dùng chung với auto-save)
-            format_on_save = {
-                timeout_ms = 500,
-                lsp_fallback = true, -- Dùng LSP nếu formatter không có
-            },
+            format_on_save = function(bufnr)
+                -- Nếu là file Python, chạy PyrightOrganizeImports im lặng
+                if vim.bo[bufnr].filetype == "python" then
+                    pcall(function() vim.api.nvim_command("silent PyrightOrganizeImports") end)
+                end
+                return { timeout_ms = 500, lsp_fallback = true }
+            end,
         })
 
         -- Phím tắt để format thủ công
         vim.keymap.set("n", "<C-s>", function()
+            -- Nếu là file Python, chạy PyrightOrganizeImports im lặng
+            if vim.bo.filetype == "python" then
+                pcall(function() vim.api.nvim_command("silent PyrightOrganizeImports") end)
+            end
             conform.format({ async = false, lsp_fallback = true })
         end, { desc = "Code Format" })
     end,
