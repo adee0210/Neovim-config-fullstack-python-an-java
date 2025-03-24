@@ -1,72 +1,59 @@
 return {
-    "akinsho/bufferline.nvim",
-    version = "*",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
-    event = "BufReadPost",
-    config = function()
-        require("bufferline").setup({
-            options = {
-                mode = "buffers",
-                numbers = "none",
-                close_command = "bdelete! %d",
-                right_mouse_command = "bdelete! %d",
-                diagnostics = "nvim_lsp",
-                diagnostics_indicator = function(count, level)
-                    local icon = level:match("error") and " " or " "
-                    return " " .. icon .. count
-                end,
-                offsets = {
-                    { filetype = "NvimTree", text = "File Explorer", highlight = "Directory", padding = 1 },
-                },
-                show_buffer_icons = true,
-                show_buffer_close_icons = true,
-                separator_style = "slant",
-                always_show_bufferline = true,
-                hover = {
-                    enabled = true,
-                    delay = 200,
-                    reveal = { "close" },
-                },
-            },
-            highlights = {
-                fill = { bg = "#1E2A3C" },
-                background = { bg = "#1E2A3C" },
-                tab = { bg = "#1E2A3C" },
-                tab_selected = { bg = "#4A4A4A", fg = "#FFFFFF" },
-                buffer = { bg = "#1E2A3C" },
-                buffer_visible = { bg = "#2F3E5C" },
-                buffer_selected = { bg = "#4A4A4A", fg = "#FFFFFF", bold = true },
-                separator = { fg = "#1E2A3C", bg = "#1E2A3C" },
-                separator_selected = { fg = "#4A4A4A", bg = "#4A90E2" },
-            },
-        })
-        vim.opt.cmdheight = 1
+  "akinsho/bufferline.nvim",
+  dependencies = { "nvim-tree/nvim-web-devicons" },
+  config = function()
+    -- Phím tắt mới với <Leader> kết hợp phím Tab vật lý
+    vim.keymap.set("n", "<Leader><Tab>", "<cmd>BufferLineCycleNext<CR>", { desc = "Next Buffer", noremap = true, silent = true })
+    vim.keymap.set("n", "<Leader><S-Tab>", "<cmd>BufferLineCyclePrev<CR>", { desc = "Previous Buffer", noremap = true, silent = true })
+    vim.keymap.set("n", "<Leader>W", "<cmd>bd<CR>", { desc = "Close Buffer", noremap = true, silent = true })
 
-        local function close_current_buffer()
-            local current_buf = vim.api.nvim_get_current_buf()
-            if vim.bo[current_buf].filetype == "NvimTree" then return end
-
-            local bufs = vim.tbl_filter(function(buf)
-                return vim.api.nvim_buf_is_loaded(buf)
-                    and buf ~= current_buf
-                    and vim.bo[buf].filetype ~= "NvimTree"
-                    and vim.bo[buf].buflisted
-            end, vim.api.nvim_list_bufs())
-
-            if #bufs > 0 then
-                vim.api.nvim_set_current_buf(bufs[1])
-                vim.api.nvim_buf_delete(current_buf, { force = true })
-            else
-                vim.api.nvim_buf_delete(current_buf, { force = true })
-                vim.cmd("enew")
-            end
-        end
-
-        vim.keymap.set("n", "<leader><Tab>", ":BufferLineCycleNext<CR>",
-            { noremap = true, silent = true, desc = "Chuyển sang buffer tiếp theo" })
-        vim.keymap.set("n", "<leader><S-Tab>", ":BufferLineCyclePrev<CR>",
-            { noremap = true, silent = true, desc = "Chuyển sang buffer trước đó" })
-        vim.keymap.set("n", "<leader>W", close_current_buffer,
-            { noremap = true, silent = true, desc = "Đóng buffer hiện tại" })
-    end,
+    require("bufferline").setup({
+      options = {
+        numbers = "ordinal", -- Hiển thị số thứ tự buffer (1, 2, 3...)
+        diagnostics = "nvim_lsp", -- Hiển thị thông tin LSP (nếu có)
+        diagnostics_indicator = function(count, level, diagnostics_dict, context)
+          local icon = level:match("error") and " " or " "
+          return " " .. icon .. count
+        end,
+        separator_style = "slant", -- Kiểu phân cách giữa các tab
+        show_buffer_close_icons = true, -- Hiển thị nút đóng buffer
+        show_close_icon = false, -- Không hiển thị nút đóng toàn bộ bufferline
+        always_show_bufferline = true, -- Luôn hiển thị bufferline
+        enforce_regular_tabs = false, -- Không ép các tab đều nhau
+        offsets = {
+          { -- Đảm bảo bufferline không đè lên nvim-tree
+            filetype = "NvimTree",
+            text = "File Explorer",
+            highlight = "Directory",
+            text_align = "left",
+            padding = 1,
+          },
+        },
+      },
+      highlights = { -- Tùy chỉnh màu sắc để đồng bộ với theme
+        fill = {
+          fg = { attribute = "fg", highlight = "Normal" },
+          bg = { attribute = "bg", highlight = "StatusLineNonText" },
+        },
+        background = {
+          fg = { attribute = "fg", highlight = "Normal" },
+          bg = { attribute = "bg", highlight = "StatusLine" },
+        },
+        buffer_selected = {
+          fg = { attribute = "fg", highlight = "Normal" },
+          bg = { attribute = "bg", highlight = "Normal" },
+          bold = true,
+          italic = false,
+        },
+        separator = {
+          fg = { attribute = "bg", highlight = "StatusLine" },
+          bg = { attribute = "bg", highlight = "StatusLine" },
+        },
+        separator_selected = {
+          fg = { attribute = "bg", highlight = "Normal" },
+          bg = { attribute = "bg", highlight = "Normal" },
+        },
+      },
+    })
+  end,
 }

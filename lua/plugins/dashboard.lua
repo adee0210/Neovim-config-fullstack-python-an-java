@@ -36,21 +36,16 @@ return {
 
         -- Hàm để tắt bufferline và toggleterm khi mở dashboard
         local function hide_ui_elements()
-            -- Tắt bufferline (giả sử dùng bufferline.nvim)
             if pcall(require, 'bufferline') then
                 vim.g.bufferline_enabled = false
-                vim.api.nvim_set_hl(0, 'BufferLineFill', { bg = 'NONE' }) -- Ẩn giao diện
+                vim.api.nvim_set_hl(0, 'BufferLineFill', { bg = 'NONE' })
             end
-
-            -- Đóng toggleterm nếu đang mở
             if pcall(require, 'toggleterm') then
                 local terms = require('toggleterm.terminal').get_all()
                 for _, term in ipairs(terms) do
-                    term:shutdown() -- Đóng hoàn toàn từng terminal
+                    term:shutdown()
                 end
             end
-
-            -- Ẩn statusline, tabline, winbar
             vim.opt.showtabline = 0
             vim.opt.laststatus = 0
             vim.opt.winbar = ''
@@ -58,15 +53,45 @@ return {
 
         -- Hàm để khôi phục UI khi rời dashboard
         local function restore_ui_elements()
-            -- Khôi phục bufferline
             if pcall(require, 'bufferline') then
                 vim.g.bufferline_enabled = true
-                vim.cmd('redrawtabline') -- Cập nhật lại tabline
+                vim.cmd('redrawtabline')
             end
-
-            -- Khôi phục statusline và tabline
             vim.opt.showtabline = 2
             vim.opt.laststatus = 2
+        end
+
+        -- Hàm tạo file hoặc thư mục mới với kiểm tra tồn tại
+        local function create_file_or_directory()
+            local current_dir = vim.fn.getcwd() .. "/"
+            local input = vim.fn.input("Nhập tên file hoặc thư mục (thư mục kết thúc bằng /): ", current_dir, "file")
+            if input == "" then
+                vim.cmd("echo 'Không có đường dẫn được nhập'")
+                return
+            end
+
+            -- Kiểm tra xem đường dẫn đã tồn tại chưa
+            local exists = vim.fn.filereadable(input) == 1 or vim.fn.isdirectory(input) == 1
+
+            if exists then
+                -- Nếu đã tồn tại, chỉ hiển thị thông báo và dừng
+                vim.cmd("redraw")
+                vim.cmd("echo 'Đường dẫn đã tồn tại: " .. input .. "'")
+            else
+                -- Nếu chưa tồn tại, tạo mới
+                if input:sub(-1) == "/" then
+                    -- Tạo thư mục
+                    vim.fn.mkdir(input, "p")
+                    vim.cmd("edit " .. input)
+                    vim.cmd("redraw")
+                    vim.cmd("echo 'Đã tạo và mở thư mục: " .. input .. "'")
+                else
+                    -- Tạo file
+                    vim.cmd("edit " .. input)
+                    vim.cmd("redraw")
+                    vim.cmd("echo 'Đã tạo và mở file: " .. input .. "'")
+                end
+            end
         end
 
         -- Cấu hình dashboard
@@ -91,9 +116,7 @@ return {
                     "",
                 },
                 center = {
-                    { icon = '📂 ', desc = 'Tạo và mở thư mục mới', group = 'DashboardDesc', key = 'm', 
-                      action = 'lua local path = vim.fn.input("Nhập đường dẫn thư mục mới: ", "", "file"); if path ~= "" then vim.fn.mkdir(path, "p"); vim.cmd("edit " .. path); vim.cmd("redraw"); vim.cmd("echo \'Đã tạo và mở thư mục: " .. path .. "\'"); else vim.cmd("echo \'Không có đường dẫn được nhập\'"); end' },
-                    { icon = '📁 ', desc = 'Tạo file mới', group = 'DashboardDesc', action = 'enew', key = 'n' },
+                    { icon = '📄 ', desc = 'Tạo file/thư mục mới', group = 'DashboardDesc', key = 'm', action = create_file_or_directory },
                     { icon = '📂 ', desc = 'Mở thư mục cấu hình', group = 'DashboardDesc', action = 'lua vim.cmd("lcd ~/.config/nvim | edit .")', key = 'c' },
                     { icon = '🔎📂 ', desc = 'Tìm thư mục', group = 'DashboardDesc', action = find_directories, key = 'd' },
                     { icon = '🔎🖹 ', desc = 'Tìm file', group = 'DashboardDesc', action = 'Telescope find_files', key = 'f' },
@@ -115,15 +138,13 @@ return {
         vim.api.nvim_create_autocmd("FileType", {
             pattern = "dashboard",
             callback = function()
-                -- Highlight footer
                 vim.api.nvim_buf_add_highlight(0, -1, 'DashboardFooter', vim.fn.line('$') - 1, 0, -1)
-                -- Highlight center (icon, desc, và key riêng)
                 local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
                 for i, line in ipairs(lines) do
-                    if line:match('^%S+%s+.*%s%[.%]') then -- Dòng có icon, desc, và key
+                    if line:match('^%S+%s+.*%s%[.%]') then
                         local icon_end = line:find('%s') or 0
                         local key_start = line:find('%[.%]') - 1 or -1
-                        local key_end = key_start + 3 -- [q] dài 3 ký tự
+                        local key_end = key_start + 3
                         vim.api.nvim_buf_add_highlight(0, -1, 'DashboardIcon', i - 1, 0, icon_end)
                         vim.api.nvim_buf_add_highlight(0, -1, 'DashboardDesc', i - 1, icon_end, key_start)
                         vim.api.nvim_buf_add_highlight(0, -1, 'DashboardKey', i - 1, key_start, key_end)
@@ -143,7 +164,7 @@ return {
             vim.opt.mouse = ""
             vim.opt_local.modifiable = false
             vim.opt_local.buftype = "nofile"
-            hide_ui_elements() -- Tắt bufferline và toggleterm
+            hide_ui_elements()
         end
 
         -- Áp dụng khóa cuộn và tắt UI khi mở dashboard
@@ -157,8 +178,8 @@ return {
         -- Khởi động Neovim với dashboard và tắt toggleterm
         vim.api.nvim_create_autocmd("VimEnter", {
             callback = function()
-                vim.cmd('Dashboard') -- Mở dashboard khi khởi động
-                lock_dashboard_scrolling() -- Đảm bảo toggleterm bị tắt ngay từ đầu
+                vim.cmd('Dashboard')
+                lock_dashboard_scrolling()
             end,
         })
 

@@ -2,9 +2,9 @@ local M = {}
 
 -- Hàm phát nhạc
 local function play_music()
-    local files = vim.fn.glob("/home/duc/Music/*", true, true)
+    local files = vim.fn.glob("/home/duc/Music/Coloi/*", true, true)
     if not files or type(files) ~= "table" or #files == 0 then
-        vim.notify("Không tìm thấy file nhạc hoặc thư mục /home/duc/Music/ không tồn tại", vim.log.levels.ERROR)
+        vim.notify("Không tìm thấy file nhạc hoặc thư mục /home/duc/Music/Coloi không tồn tại", vim.log.levels.ERROR)
         return
     end
 

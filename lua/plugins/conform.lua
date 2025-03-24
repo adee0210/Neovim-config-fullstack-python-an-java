@@ -44,9 +44,8 @@ return {
             },
             -- Format khi lưu (dùng chung với auto-save)
             format_on_save = function(bufnr)
-                -- Nếu là file Python, chạy PyrightOrganizeImports im lặng
                 if vim.bo[bufnr].filetype == "python" then
-                    pcall(function() vim.api.nvim_command("silent PyrightOrganizeImports") end)
+                    pcall(function() vim.api.nvim_command("silent! PyrightOrganizeImports") end)
                 end
                 return { timeout_ms = 500, lsp_fallback = true }
             end,
@@ -54,11 +53,21 @@ return {
 
         -- Phím tắt để format thủ công
         vim.keymap.set("n", "<C-s>", function()
-            -- Nếu là file Python, chạy PyrightOrganizeImports im lặng
             if vim.bo.filetype == "python" then
-                pcall(function() vim.api.nvim_command("silent PyrightOrganizeImports") end)
+                -- Ghi đè vim.notify để chặn thông báo trong phạm vi lệnh này
+                local original_notify = vim.notify
+                vim.notify = function(msg, ...)
+                    if msg:match("pyright%.organizeimports") then
+                        return -- Chặn thông báo liên quan đến pyright.organizeimports
+                    end
+                    original_notify(msg, ...)
+                end
+                -- Chạy PyrightOrganizeImports
+                pcall(function() vim.api.nvim_command("silent! PyrightOrganizeImports") end)
+                -- Khôi phục vim.notify sau khi chạy lệnh
+                vim.notify = original_notify
             end
             conform.format({ async = false, lsp_fallback = true })
-        end, { desc = "Code Format" })
+        end, { desc = "Code Format", silent = true })
     end,
 }

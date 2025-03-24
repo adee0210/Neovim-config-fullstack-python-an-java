@@ -107,6 +107,18 @@ local function setup_jdtls()
                     profile = "GoogleStyle",
                 },
             },
+            imports = {
+                gradle = {
+                    wrapper = {
+                        checksums = {
+                            {
+                                sha256 = "81a82aaea5abcc8ff68b3dfcb58b3c3c429378efd98e7433460610fecd7ae45f",
+                                allowed = true,
+                            },
+                        },
+                    },
+                },
+            },
             eclipse = { downloadSources = true },
             maven = { downloadSources = true },
             signatureHelp = { enabled = true },
@@ -163,7 +175,6 @@ local function setup_jdtls()
         -- Tự động chạy organize_and_format khi lưu file Java
         vim.api.nvim_create_autocmd("BufWritePre", {
             buffer = bufnr,
-            pattern = { "*.java" },
             callback = function()
                 pcall(organize_and_format)
             end,

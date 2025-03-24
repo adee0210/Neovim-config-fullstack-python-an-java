@@ -42,9 +42,9 @@ local function run_python_in_terminal()
     end
 end
 
--- Hàm kết hợp format và organize imports
+-- Hàm kết hợp format và organize imports (giữ lại nhưng không gán keymap)
 local function format_and_organize()
-    pcall(function() vim.api.nvim_command("silent! PyrightOrganizeImports") end) -- Chạy im lặng với silent!
+    pcall(function() vim.api.nvim_command("silent! PyrightOrganizeImports") end)
     require("conform").format({ async = false, lsp_fallback = true })
 end
 
@@ -57,7 +57,7 @@ local function python_keymaps(bufnr)
     vim.keymap.set("n", "<leader>Pv", "<Cmd>lua require('refactoring').refactor('Extract Variable')<CR>", vim.tbl_extend("force", opts, { desc = "Trích xuất biến" }))
     vim.keymap.set("n", "<leader>Pr", run_python_in_terminal, vim.tbl_extend("force", opts, { desc = "Chạy file Python" }))
     vim.keymap.set("n", "<leader>Px", function() if python_term then python_term:toggle() end end, vim.tbl_extend("force", opts, { desc = "Bật/Tắt terminal Python" }))
-    vim.keymap.set("n", "<C-s>", format_and_organize, vim.tbl_extend("force", opts, { desc = "Lưu và định dạng mã Python" }))
+    -- Bỏ keymap <C-s> ở đây để tránh xung đột
 end
 
 local function setup_pyright()
@@ -71,7 +71,7 @@ local function setup_pyright()
     local handlers = {
         ["workspace/executeCommand"] = function(err, result, ctx, config)
             if ctx.command == "pyright.organizeimports" then
-                return -- Chặn hoàn toàn thông báo từ lệnh này
+                return -- Chặn thông báo từ lệnh này
             end
             return vim.lsp.handlers["workspace/executeCommand"](err, result, ctx, config)
         end,
@@ -114,7 +114,7 @@ local function setup_pyright()
                     },
                 },
             },
-            handlers = handlers, -- Sử dụng handlers đã tùy chỉnh
+            handlers = handlers,
             on_attach = function(client, bufnr)
                 python_keymaps(bufnr)
                 vim.keymap.set("n", "<leader>Pp", update_pyright_paths, { buffer = bufnr, desc = "Cập nhật extraPaths Pyright" })
@@ -164,7 +164,7 @@ local function setup_pyright()
                 },
             },
         },
-        handlers = handlers, -- Sử dụng handlers đã tùy chỉnh
+        handlers = handlers,
         on_attach = function(client, bufnr)
             python_keymaps(bufnr)
             vim.keymap.set("n", "<leader>Pp", update_pyright_paths, { buffer = bufnr, desc = "Cập nhật extraPaths Pyright" })
