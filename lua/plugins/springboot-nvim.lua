@@ -54,25 +54,14 @@ return {
                     if exit_code ~= 0 then
                         vim.notify("Spring Boot terminated with exit code: " .. exit_code, vim.log.levels.ERROR)
                     end
+                    -- Không đặt spring_term = nil để bạn tự quản lý việc tắt
                 end,
             })
             spring_term:toggle() -- Mở hoặc đóng terminal
         end
 
-        -- Hàm đóng terminal thủ công
-        local function close_spring_term()
-            if spring_term then
-                spring_term:shutdown()
-                spring_term = nil
-                vim.notify("Spring Boot terminal closed", vim.log.levels.INFO)
-            else
-                vim.notify("No Spring Boot terminal to close", vim.log.levels.WARN)
-            end
-        end
-
         -- Thiết lập phím tắt
         vim.keymap.set('n', '<leader>jr', boot_run, { desc = "Java Run Spring Boot" })
-        vim.keymap.set('n', '<leader>jx', close_spring_term, { desc = "Java Exit Spring Boot Terminal" })
         vim.keymap.set('n', '<leader>jc', springboot_nvim.generate_class, { desc = "Java Create Class" })
         vim.keymap.set('n', '<leader>ji', springboot_nvim.generate_interface, { desc = "Java Create Interface" })
         vim.keymap.set('n', '<leader>je', springboot_nvim.generate_enum, { desc = "Java Create Enum" })

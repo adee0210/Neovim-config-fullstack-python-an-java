@@ -33,7 +33,7 @@ vim.opt.updatetime = 300 -- thiết lập thời gian hoàn thành nhanh hơn
 vim.opt.writebackup = false -- ngăn chặn việc chỉnh sửa các file đang được chỉnh sửa ở nơi khác
 vim.opt.cursorline = true -- làm nổi bật dòng hiện tại
 vim.o.swapfile = false  -- Tắt tính năng tạo file swap
-
+vim.env.PATH = "/home/duc/.nvm/versions/node/v22.10.0/bin:" .. vim.env.PATH
 -- Các hành vi tìm kiếm
 vim.opt.hlsearch = true -- bật tính năng highlight tất cả kết quả tìm kiếm
 vim.opt.ignorecase = true -- không phân biệt chữ hoa/thường khi tìm kiếm
