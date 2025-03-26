@@ -169,7 +169,7 @@ return {
             end,
         })
 
-        -- Khởi động Neovim với dashboard, không khởi động LSP
+        -- Khởi động Neovim với dashboard
         vim.api.nvim_create_autocmd("VimEnter", {
             callback = function()
                 vim.cmd('Dashboard')
@@ -177,7 +177,7 @@ return {
             end,
         })
 
-        -- Khôi phục UI khi rời dashboard, không khởi động lại LSP ở đây
+        -- Khôi phục UI khi rời dashboard
         vim.api.nvim_create_autocmd("BufLeave", {
             pattern = "*",
             callback = function()

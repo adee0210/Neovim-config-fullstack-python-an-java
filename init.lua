@@ -29,7 +29,16 @@ local opts = {
 		notify = false,
 	},
 }
+-- Thiết lập Python cho Neovim
 vim.g.python3_host_prog = vim.fn.expand("~/.python_envs/global_env/bin/python")
+
+-- Thêm Node.js và Python vào PATH
+vim.env.PATH = table.concat({
+    "/home/duc/.nvm/versions/node/v22.10.0/bin",
+    vim.fn.expand("~/.python_envs/global_env/bin"),
+    vim.env.PATH
+}, ":")
+
 
 -- Load the options from the config/options.lua file
 require("config.options")

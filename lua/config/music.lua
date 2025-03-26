@@ -87,25 +87,25 @@ end
 -- Thiết lập phím tắt với mô tả
 function M.setup()
     local keymap_opts = { noremap = true, silent = false }
-    vim.api.nvim_set_keymap("n", "<leader>mp", "", {
+    vim.api.nvim_set_keymap("n", "<leader>Mp", "", {
         callback = play_music,
         noremap = true,
         silent = false,
         desc = "Phát tất cả nhạc trong /home/duc/Music/Coloi/"
     })
-    vim.api.nvim_set_keymap("n", "<leader>mk", "", {
+    vim.api.nvim_set_keymap("n", "<leader>Mk", "", {
         callback = play_music_khongloi,
         noremap = true,
         silent = false,
         desc = "Phát tất cả nhạc trong /home/duc/Music/Khongloi/"
     })
-    vim.api.nvim_set_keymap("n", "<leader>mt", "", {
+    vim.api.nvim_set_keymap("n", "<leader>Mt", "", {
         callback = toggle_music,
         noremap = true,
         silent = false,
         desc = "Tạm dừng hoặc tiếp tục phát nhạc"
     })
-    vim.api.nvim_set_keymap("n", "<leader>ms", "", {
+    vim.api.nvim_set_keymap("n", "<leader>Ms", "", {
         callback = kill_music,
         noremap = true,
         silent = false,
