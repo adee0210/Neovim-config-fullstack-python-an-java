@@ -6,10 +6,10 @@ return {
         local dashboard = require('dashboard')
 
         -- Định nghĩa nhóm highlight
-        vim.api.nvim_set_hl(0, 'DashboardFooter', { fg = '#FF69B4', bold = true }) -- Màu hồng cho footer
-        vim.api.nvim_set_hl(0, 'DashboardDesc', { fg = '#FFFFFF' }) -- Màu trắng cho desc
-        vim.api.nvim_set_hl(0, 'DashboardIcon', { fg = '#FF69B4', bold = true }) -- Màu hồng cho icon
-        vim.api.nvim_set_hl(0, 'DashboardKey', { fg = '#87CEEB', bold = true }) -- Màu xanh dương nhạt cho key
+        vim.api.nvim_set_hl(0, 'DashboardFooter', { fg = '#FF69B4', bold = true })
+        vim.api.nvim_set_hl(0, 'DashboardDesc', { fg = '#FFFFFF' })
+        vim.api.nvim_set_hl(0, 'DashboardIcon', { fg = '#FF69B4', bold = true })
+        vim.api.nvim_set_hl(0, 'DashboardKey', { fg = '#87CEEB', bold = true })
 
         -- Hàm tạo footer với thứ, ngày tháng năm
         local function get_footer()
@@ -70,23 +70,17 @@ return {
                 return
             end
 
-            -- Kiểm tra xem đường dẫn đã tồn tại chưa
             local exists = vim.fn.filereadable(input) == 1 or vim.fn.isdirectory(input) == 1
-
             if exists then
-                -- Nếu đã tồn tại, chỉ hiển thị thông báo và dừng
                 vim.cmd("redraw")
                 vim.cmd("echo 'Đường dẫn đã tồn tại: " .. input .. "'")
             else
-                -- Nếu chưa tồn tại, tạo mới
                 if input:sub(-1) == "/" then
-                    -- Tạo thư mục
                     vim.fn.mkdir(input, "p")
                     vim.cmd("edit " .. input)
                     vim.cmd("redraw")
                     vim.cmd("echo 'Đã tạo và mở thư mục: " .. input .. "'")
                 else
-                    -- Tạo file
                     vim.cmd("edit " .. input)
                     vim.cmd("redraw")
                     vim.cmd("echo 'Đã tạo và mở file: " .. input .. "'")
@@ -175,7 +169,7 @@ return {
             end,
         })
 
-        -- Khởi động Neovim với dashboard và tắt toggleterm
+        -- Khởi động Neovim với dashboard, không khởi động LSP
         vim.api.nvim_create_autocmd("VimEnter", {
             callback = function()
                 vim.cmd('Dashboard')
@@ -183,7 +177,7 @@ return {
             end,
         })
 
-        -- Khôi phục UI khi rời dashboard
+        -- Khôi phục UI khi rời dashboard, không khởi động lại LSP ở đây
         vim.api.nvim_create_autocmd("BufLeave", {
             pattern = "*",
             callback = function()

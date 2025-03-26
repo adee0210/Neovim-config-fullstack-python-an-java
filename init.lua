@@ -40,6 +40,6 @@ require("config.autocmds")
 -- Setup lazy, this should always be last
 -- Tell lazy that all plugin specs are found in the plugins directory
 -- Pass it the options we specified above
+-- vim.cmd('runtime! plugin/rplugin.vim')
 require("config.music")
-require("plugins.molten")
 require("lazy").setup("plugins", opts)

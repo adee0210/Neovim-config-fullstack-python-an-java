@@ -5,22 +5,31 @@ return {
         lazy = false,
         dependencies = { "3rd/image.nvim" },
         config = function()
-            vim.g.molten_auto_open_output = true
-            vim.g.molten_wrap_output = true
-            vim.g.molten_virt_text_output = true
-            vim.g.molten_output_win_border = { " ", "", " ", " " }
-            vim.g.molten_output_win_max_height = 50 -- Tăng chiều cao tối đa
-            vim.g.molten_output_win_max_width = 200 -- Thêm chiều rộng tối đa
-            vim.g.molten_image_provider = "image.nvim"
+            -- Cấu hình Molten
+            vim.g.molten_auto_open_output = true -- Tự động mở output
+            vim.g.molten_wrap_output = true -- Wrap output nếu quá dài
+            vim.g.molten_virt_text_output = false -- Không hiển thị output dạng virtual text
+            vim.g.molten_output_win_border = { " ", "", " ", " " } -- Viền cửa sổ output
+            vim.g.molten_output_win_max_height = 50 -- Chiều cao tối đa
+            vim.g.molten_output_win_max_width = 200 -- Chiều rộng tối đa
+            vim.g.molten_image_provider = "image.nvim" -- Sử dụng image.nvim cho hình ảnh
+            vim.g.molten_output_show_more = true -- Hiển thị thêm output nếu có (không ẩn)
 
+            -- Đảm bảo output không bị đóng khi rời block
+            vim.g.molten_auto_close_output = false -- Ngăn tự động đóng output (nếu plugin hỗ trợ)
+
+            -- Tắt highlight khi trỏ tới block
+            vim.g.molten_highlight_output = false -- Tắt hiệu ứng sáng output (nếu plugin hỗ trợ)
+
+            -- Cấu hình image.nvim
             local python_path = vim.fn.expand("~/.python_envs/global_env/bin/python")
-
             require("image").setup({
                 backend = "kitty",
-                max_width = 200, -- Tăng chiều rộng tối đa của ảnh
-                max_height = 50, -- Tăng chiều cao tối đa của ảnh
+                max_width = 200, -- Chiều rộng tối đa của ảnh
+                max_height = 50, -- Chiều cao tối đa của ảnh
             })
 
+            -- Keymaps
             local keymap = vim.keymap.set
             keymap("n", "<leader>mi", function()
                 local result = vim.fn.system(python_path .. " -m ipykernel install --user --name=global_env_python")

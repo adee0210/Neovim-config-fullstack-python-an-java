@@ -1,5 +1,5 @@
 return {
-    -- Plugin Mason để quản lý các công cụ phát triển
+    -- Các plugin hiện tại của bạn
     {
         "williamboman/mason.nvim",
         config = function()
@@ -9,92 +9,105 @@ return {
         end,
     },
 
-    -- Plugin Mason LSP config để quản lý các máy chủ ngôn ngữ
+    -- Thêm các plugin cho nvim-cmp
     {
-        "williamboman/mason-lspconfig.nvim",
+        "hrsh7th/cmp-path", -- Gợi ý đường dẫn
+    },
+    {
+        "hrsh7th/cmp-nvim-lsp", -- Gợi ý từ LSP
+    },
+    {
+        "L3MON4D3/LuaSnip", -- Snippet engine
+        dependencies = {
+            "saadparwaiz1/cmp_luasnip", -- Tích hợp LuaSnip với nvim-cmp
+            "rafamadriz/friendly-snippets", -- Thư viện snippet
+        },
+    },
+    {
+        "hrsh7th/nvim-cmp", -- Plugin chính cho code completion
+        dependencies = {
+            "hrsh7th/cmp-nvim-lsp",
+            "jmbuhr/otter.nvim", -- Tích hợp otter.nvim cho .md/.qmd
+            "hrsh7th/cmp-buffer", -- Thêm lại để hỗ trợ nguồn buffer
+            "hrsh7th/cmp-path", -- Thêm lại để hỗ trợ nguồn path
+        },
         config = function()
-            require("mason-lspconfig").setup({
-                ensure_installed = {
-                    "lua_ls",
-                    "ts_ls",
-                    "jdtls",
-                    "html",
-                    "cssls",
-                    "groovyls",
-                    "kotlin_language_server",
-                    "pyright",
+            local cmp = require("cmp")
+            require("luasnip.loaders.from_vscode").lazy_load() -- Tải snippet từ VSCode
+
+            cmp.setup({
+                snippet = {
+                    expand = function(args)
+                        require("luasnip").lsp_expand(args.body) -- Mở rộng snippet
+                    end,
                 },
-                automatic_installation = true,
-            })
-        end,
-    },
-
-    -- Plugin Mason DAP config để quản lý các trình gỡ lỗi
-    {
-        "jay-babu/mason-nvim-dap.nvim",
-        config = function()
-            require("mason-nvim-dap").setup({
-                ensure_installed = { "java-debug-adapter", "java-test", "python" },
-            })
-        end,
-    },
-
-    -- Plugin nvim-jdtls để cấu hình máy chủ ngôn ngữ Java
-    {
-        "mfussenegger/nvim-jdtls",
-        dependencies = { "mfussenegger/nvim-dap" },
-    },
-
-    -- Plugin toggleterm.nvim để hiển thị terminal
-    {
-        "akinsho/toggleterm.nvim",
-        version = "*",
-        config = function()
-            require("toggleterm").setup({
-                size = 15,
-                open_mapping = [[<c-\>]],
-                hide_numbers = true,
-                shade_terminals = true,
-                shading_factor = 2,
-                start_in_insert = true,
-                insert_mappings = true,
-                persist_size = true,
-                direction = "horizontal",
-                close_on_exit = false,
-                shell = vim.o.shell,
-                float_opts = {
-                    border = "curved",
-                    winblend = 3,
-                    highlights = {
-                        border = "Normal",
-                        background = "Normal",
-                    },
+                window = {
+                    completion = cmp.config.window.bordered(),
+                    documentation = cmp.config.window.bordered(),
                 },
+                mapping = cmp.mapping.preset.insert({
+                    ["<C-b>"] = cmp.mapping.scroll_docs(-4),
+                    ["<C-f>"] = cmp.mapping.scroll_docs(4),
+                    ["<C-Space>"] = cmp.mapping.complete(), -- Mở menu gợi ý
+                    ["<C-e>"] = cmp.mapping.abort(), -- Đóng menu gợi ý
+                    ["<CR>"] = cmp.mapping.confirm({ select = true }), -- Chấp nhận gợi ý
+                    ["<Tab>"] = cmp.mapping(function(fallback)
+                        if cmp.visible() then
+                            cmp.select_next_item()
+                        elseif require("luasnip").expand_or_jumpable() then
+                            vim.fn.feedkeys(
+                                vim.api.nvim_replace_termcodes("<Plug>luasnip-expand-or-jump", true, true, true),
+                                ""
+                            )
+                        else
+                            fallback()
+                        end
+                    end, { "i", "s" }),
+                    ["<S-Tab>"] = cmp.mapping(function(fallback)
+                        if cmp.visible() then
+                            cmp.select_prev_item()
+                        elseif require("luasnip").jumpable(-1) then
+                            vim.fn.feedkeys(
+                                vim.api.nvim_replace_termcodes("<Plug>luasnip-jump-prev", true, true, true),
+                                ""
+                            )
+                        else
+                            fallback()
+                        end
+                    end, { "i", "s" }),
+                }),
+                sources = cmp.config.sources({
+                    { name = "nvim_lsp" }, -- Gợi ý từ LSP
+                    { name = "luasnip" }, -- Gợi ý từ snippet
+                    { name = "otter" }, -- Gợi ý từ otter.nvim cho .md/.qmd
+                    { name = "path" }, -- Gợi ý đường dẫn
+                }, {
+                    { name = "buffer" }, -- Gợi ý từ buffer
+                }),
             })
         end,
     },
 
-    -- Plugin nvim-lspconfig để cấu hình các máy chủ ngôn ngữ
+    -- Plugin nvim-lspconfig (giữ nguyên, chỉ thêm dependencies cần thiết nếu thiếu)
     {
         "neovim/nvim-lspconfig",
         dependencies = {
             "williamboman/mason.nvim",
             "williamboman/mason-lspconfig.nvim",
             "mfussenegger/nvim-jdtls",
-            "stevearc/conform.nvim", -- Thêm conform.nvim vào dependencies
+            "stevearc/conform.nvim",
             "akinsho/toggleterm.nvim",
+            "quarto-dev/quarto-nvim",
+            "jmbuhr/otter.nvim",
+            "hrsh7th/cmp-nvim-lsp", -- Đảm bảo tích hợp với nvim-cmp
         },
         config = function()
-            -- Yêu cầu và cấu hình conform trước
             require("plugins.conform")
-
             local lspconfig = require("lspconfig")
             local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
-            -- Gọi setup_pyright từ module trong lua/config/pyright.lua
+            -- Cấu hình LSP (giữ nguyên như bạn đã có)
             require("config.pyright").setup_pyright()
-
-            -- Cấu hình các máy chủ ngôn ngữ khác
             lspconfig.lua_ls.setup({ capabilities = capabilities })
             lspconfig.ts_ls.setup({ capabilities = capabilities })
             lspconfig.html.setup({ capabilities = capabilities })
@@ -105,7 +118,7 @@ return {
                 root_dir = lspconfig.util.root_pattern(".git", "gradlew", "build.gradle", "pom.xml"),
             })
 
-            -- Cấu hình phím tắt chung cho LSP
+            -- Phím tắt LSP (giữ nguyên)
             vim.keymap.set("n", "<leader>ch", vim.lsp.buf.hover, { desc = "Tài liệu khi di chuột qua mã" })
             vim.keymap.set("n", "<leader>cd", vim.lsp.buf.definition, { desc = "Đi đến định nghĩa mã" })
             vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, { desc = "Hành động mã" })
@@ -114,14 +127,13 @@ return {
             vim.keymap.set("n", "<leader>cR", vim.lsp.buf.rename, { desc = "Đổi tên mã" })
             vim.keymap.set("n", "<leader>cD", vim.lsp.buf.declaration, { desc = "Đi đến khai báo mã" })
 
-            -- Autocommands
+            -- Autocommands (giữ nguyên)
             vim.api.nvim_create_autocmd("FileType", {
                 pattern = "java",
                 callback = function()
                     require("config.jdtls").setup_jdtls()
                 end,
             })
-
             vim.api.nvim_create_autocmd("FileType", {
                 pattern = { "kotlin", "kts" },
                 callback = function()
