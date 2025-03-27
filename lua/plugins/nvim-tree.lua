@@ -9,9 +9,9 @@ return {
       auto_reload_on_write = true,
       view = {
         side = "right",
-        width = 50, -- Chiều rộng cố định
-        preserve_window_proportions = false, -- Tắt giữ tỷ lệ
-        float = { enable = false }, -- Đảm bảo không dùng floating window
+        width = 50,
+        preserve_window_proportions = false,
+        float = { enable = false },
       },
       renderer = {
         indent_markers = { enable = false },
@@ -53,7 +53,7 @@ return {
       actions = {
         open_file = {
           quit_on_open = false,
-          resize_window = false, -- Tắt resize tự động
+          resize_window = false,
           window_picker = { enable = false },
         },
       },
@@ -63,6 +63,7 @@ return {
           return { desc = "nvim-tree: " .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
         end
 
+        -- Tùy chỉnh keymap "o" để mở file hoặc thư mục
         vim.keymap.set("n", "o", function()
           local node = api.tree.get_node_under_cursor()
           if node.nodes then
@@ -72,7 +73,11 @@ return {
           end
         end, opts("Open file/folder"))
 
+        -- Gán các mapping mặc định
         api.config.mappings.default_on_attach(bufnr)
+
+        -- Thêm keymap để tự động mở rộng tất cả các thư mục
+        vim.keymap.set("n", "<leader>a", api.tree.expand_all, opts("Expand All Folders"))
 
         -- Ép chiều rộng Nvim Tree luôn là 50
         local function fix_nvim_tree_width()
@@ -88,6 +93,9 @@ return {
           callback = fix_nvim_tree_width,
           group = vim.api.nvim_create_augroup("NvimTreeFixedWidth", { clear = true }),
         })
+
+        -- Tự động mở rộng tất cả các thư mục khi mở nvim-tree
+        api.tree.expand_all()
       end,
     })
 
@@ -95,8 +103,8 @@ return {
     vim.api.nvim_create_autocmd("FileType", {
       pattern = "NvimTree",
       callback = function()
-        vim.api.nvim_win_set_option(0, "winfixwidth", true) -- Khóa chiều rộng cửa sổ
-        vim.api.nvim_win_set_width(0, 50) -- Đặt lại chiều rộng là 50
+        vim.api.nvim_win_set_option(0, "winfixwidth", true)
+        vim.api.nvim_win_set_width(0, 50)
       end,
     })
   end,

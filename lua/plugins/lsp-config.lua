@@ -4,7 +4,7 @@ return {
         "williamboman/mason.nvim",
         config = function()
             require("mason").setup({
-                ensure_installed = { "black" },
+                ensure_installed = { "black", "r-languageserver" }, -- Thêm r-languageserver vào danh sách cài đặt
             })
         end,
     },
@@ -117,6 +117,21 @@ return {
                 filetypes = { "groovy" },
                 root_dir = lspconfig.util.root_pattern(".git", "gradlew", "build.gradle", "pom.xml"),
             })
+            
+           -- Thêm cấu hình cho R language server
+lspconfig.r_language_server.setup({
+    capabilities = capabilities,
+    filetypes = { "r", "rmd", "quarto" },
+    settings = {
+        r = {
+            lsp = {
+                rich_documentation = false,
+                -- CHỈ THÊM DÒNG NÀY - ĐƯỜNG DẪN THƯ VIỆN R CÁ NHÂN
+                libPaths = { "~/R/library" }
+            },
+        },
+    },
+})
 
             -- Phím tắt LSP (giữ nguyên)
             vim.keymap.set("n", "<leader>ch", vim.lsp.buf.hover, { desc = "Tài liệu khi di chuột qua mã" })

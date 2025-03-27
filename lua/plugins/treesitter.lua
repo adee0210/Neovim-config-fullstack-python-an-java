@@ -7,7 +7,7 @@ return {
     config = function()
         local ts_config = require("nvim-treesitter.configs")
         ts_config.setup({
-            -- Thêm "python" vào danh sách
+            -- Thêm "r" vào danh sách
             ensure_installed = {
                 "vim",
                 "vimdoc",
@@ -22,7 +22,8 @@ return {
                 "markdown",
                 "markdown_inline",
                 "gitignore",
-                "python", -- Thêm parser cho Python
+                "python", -- Parser cho Python
+                "r",     -- Thêm parser cho R
             },
             highlight = {
                 enable = true,

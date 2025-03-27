@@ -6,7 +6,7 @@ return {
     config = function()
         require("quarto").setup({
             lspFeatures = {
-                languages = { "python" },
+                languages = { "python", "r" },  -- CHỈ THÊM "r" VÀO ĐÂY
                 chunks = "all",
                 diagnostics = {
                     enabled = true,
@@ -33,7 +33,7 @@ return {
             pattern = { "markdown", "quarto" },
             callback = function()
                 if pcall(require, "nvim-treesitter.parsers") then
-                    require("otter").activate({ "python" }, true) -- Kích hoạt otter với debug
+                    require("otter").activate({ "python", "r" })  -- VÀ THÊM "r" VÀO ĐÂY
                 else
                     print("Treesitter not available, otter activation skipped")
                 end
@@ -42,6 +42,6 @@ return {
     end,
     dependencies = {
         "jmbuhr/otter.nvim",
-        "nvim-treesitter/nvim-treesitter", -- Đảm bảo Treesitter là dependency
+        "nvim-treesitter/nvim-treesitter",
     },
 }
