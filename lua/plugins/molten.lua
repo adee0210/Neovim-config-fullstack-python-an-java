@@ -13,7 +13,9 @@ return {
       vim.g.molten_image_provider = "image.nvim"   -- Sử dụng image.nvim cho hình ảnh
 
       -- Tăng kích thước khung output (dành cho virtual lines)
-      vim.g.molten_virt_lines_height = 20          -- Tăng chiều cao tối đa của virtual lines
+      vim.g.molten_virt_lines_height = 40         -- Tăng chiều cao tối đa của virtual lines
+      -- Đặt màu output thành trắng cho virtual text
+      vim.api.nvim_set_hl(0, "MoltenVirtualText", { fg = "#E0E0E0" })  -- Màu trắng cho output
 
       -- Đường dẫn Python cụ thể
       local python_path = vim.fn.expand("~/.python_envs/global_env/bin/python")

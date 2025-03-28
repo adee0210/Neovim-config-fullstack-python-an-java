@@ -9,9 +9,9 @@ vim.opt.sidescrolloff = 8 -- số cột giữ ở bên trái/phải con trỏ
 
 -- Thụt lề/Tab
 vim.opt.expandtab = true -- chuyển đổi tab thành dấu cách
-vim.opt.shiftwidth = 4 -- số dấu cách chèn vào cho mỗi cấp độ thụt lề
-vim.opt.tabstop = 4 -- số dấu cách chèn vào cho ký tự tab
-vim.opt.softtabstop = 4 -- số dấu cách chèn vào khi nhấn phím <Tab>
+vim.opt.shiftwidth = 2 -- số dấu cách chèn vào cho mỗi cấp độ thụt lề
+vim.opt.tabstop = 2 -- số dấu cách chèn vào cho ký tự tab
+vim.opt.softtabstop = 2 -- số dấu cách chèn vào khi nhấn phím <Tab>
 vim.opt.smartindent = true -- bật thụt lề thông minh
 vim.opt.breakindent = true -- bật thụt lề khi xuống dòng
 

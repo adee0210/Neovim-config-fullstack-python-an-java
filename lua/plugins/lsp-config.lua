@@ -126,9 +126,11 @@ lspconfig.r_language_server.setup({
         r = {
             lsp = {
                 rich_documentation = false,
-                -- CHỈ THÊM DÒNG NÀY - ĐƯỜNG DẪN THƯ VIỆN R CÁ NHÂN
                 libPaths = { "~/R/library" }
             },
+            linting = {
+                enabled = false -- Tắt toàn bộ linting
+            }
         },
     },
 })
