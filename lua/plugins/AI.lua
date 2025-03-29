@@ -15,12 +15,6 @@ return {
         },
       },
     },
-    keys = {
-      { "<leader>Cc", "<cmd>AvanteAsk<CR>", desc = "Mở Avante Chat" },
-      { "<leader>Cs", "<cmd>AvanteStatus<CR>", desc = "Xem trạng thái Avante" },
-      { "<leader>Ct", "<cmd>AvanteToggle<CR>", desc = "Bật/tắt giao diện Avante" },
-      { "<leader>Cr", "<cmd>AvanteRefresh<CR>", desc = "Làm mới kết nối hoặc nội dung Avante" },
-    },
     build = "make",
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
